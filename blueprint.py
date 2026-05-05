@@ -20,6 +20,36 @@ class Blueprint:
         """
         pass
 
+    ########
+    # read #
+    ########
+    def read(self, filename):
+        """
+        Reads the contents of a file and returns it as a string.
+
+        Args:
+            filename (str): Path to the file to read.
+
+        Returns:
+            str: Contents of the file.
+        """
+        with open(filename, 'r') as file:
+            return file.read()
+
+    #########
+    # write #
+    #########
+    def write(self, filename, txt):
+        """
+        Writes a string to the specified file.
+
+        Args:
+            filename (str): Path to the file to write.
+            txt (str): String of text to be written.
+        """
+        with open(filename, 'w') as file:
+            file.write(txt)
+
     ##########
     # indent #
     ##########
@@ -35,6 +65,27 @@ class Blueprint:
             str: Indented text.
         """
         return textwrap.indent(txt, " " * spaces)
+
+    ########
+    # exec #
+    ########
+    def exec(self, txt, namespace = None):
+        """
+        Executes a string of Python code and returns the resulting namespace.
+
+        Args:
+            txt (str): A string containing Python code to execute.
+            namespace (dict, optional): Namespace dict to execute the code in. Defaults to {}.
+
+        Returns:
+            dict: The namespace after executing the code.
+        """
+        if namespace is None:
+            namespace = {}
+
+        exec(txt, namespace)
+
+        return namespace
 
     ########
     # eval #
@@ -59,7 +110,7 @@ class Blueprint:
 
         namespace = {"blueprint": self, "params": params}
 
-        utils.exec(txt, namespace)
+        self.exec(txt, namespace)
 
         return namespace["txt"]
 
@@ -78,7 +129,7 @@ class Blueprint:
         Returns:
             str: The evaluated and indented text.
         """
-        return self.indent(self.eval(utils.read(filename), params), spaces)
+        return self.indent(self.eval(self.read(filename), params), spaces)
 
 
 blueprint = Blueprint()
